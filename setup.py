@@ -43,7 +43,7 @@ if __name__ == '__main__':
               'Topic :: Software Development :: Libraries',
           ],
           platforms='any',
-          packages=['dirty_cat'],
+          packages=['dirty_cat', 'dirty_cat.datasets', 'dirty_cat.test'],
           package_data={'dirty_cat': ['VERSION.txt', 'data/*.csv.gz']},
           install_requires=['sklearn', 'numpy', 'scipy', 'requests'],
           **extra_setuptools_args)
