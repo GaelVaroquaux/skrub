@@ -65,11 +65,13 @@ def cheap_ngram_minhash(strings, n_hashes=8):
 #     100% hash collisions
 # - Do intensive benchmarking to:
 #   - Tune the parameters of the Linear Congruential Generator https://en.wikipedia.org/wiki/Linear_congruential_generator#c_%E2%89%A0_0
+#     Maybe figure of merit here should be how well the Jaccard is
+#     approximated
 #   - Choose the default size of ngrams, maybe as a function of the dtype
 #     of the string array (which tells us the length of the longuest
 #     string, in which case we need to return the chosen value, to be
 #     able to have identical train and test
-#   - Do performance optimizations
+#   - Do performance optimizations, look also at memory consumption
 # - Consider API (objects, functions?) for best match (or good-enough
 #   match), multiple queries, screening
 # - Merge with skrub/_minhash_encoder.py (requires consider maybe a
@@ -99,16 +101,12 @@ print(f'Found {strings[match_idx]}')
 # exact matches
 
 # ----------------------------------------------
-#
+# Harder real-life case
 data = datasets.get_ken_embeddings()
 strings = data['Entity'].str[1:-1]
 
 minmaxhash = cheap_ngram_minhash(strings)
-# 'Horatio, Mississippi' is hard to match to 'Horatio,_Mississippi'.
-# This is probably due to the number of repeated n_gram in "Mississippi"
-# XXX: make a test case
 # Consider 4grams?
-# TODO: do systematic
 query = cheap_ngram_minhash(['Horatio, Mississippi', ])
 
 nb_hashes_diff = (minmaxhash != query).sum(axis=-1)
@@ -116,3 +114,11 @@ n_matches_to_keep = 10
 selection = np.argpartition(nb_hashes_diff,
                             n_matches_to_keep)[:n_matches_to_keep]
 print(strings.iloc[selection].tolist())
+
+# ----------------------------------------------
+# ' Mississippi' is hard to match to '_Mississippi'.
+# This is probably due to the number of repeated n_gram in "Mississippi"
+print(np.mean(cheap_ngram_minhash(['_Mississippi', ], n_hashes=20)
+      == cheap_ngram_minhash([' Mississippi', ], n_hashes=20)))
+# The above gives only 0.45, while we expect much more due to a high
+# Jaccard
