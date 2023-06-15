@@ -60,6 +60,9 @@ def cheap_ngram_minhash(strings, n_hashes=8):
     return minmaxhash
 
 ## TODO:
+# - Check that the hash is independent of the end padding length (so that
+#   the same string hashes the same way if it is alone or along long
+#   strings)
 # - Unit tests:
 #   - a test case that checks that exact matchings always give
 #     100% hash collisions
@@ -72,6 +75,10 @@ def cheap_ngram_minhash(strings, n_hashes=8):
 #     string, in which case we need to return the chosen value, to be
 #     able to have identical train and test
 #   - Do performance optimizations, look also at memory consumption
+# - Consider reordering the ASCI so that similar letters (E and e) are
+#   close to one another
+#   Check that this is beneficial "aaAaaa" is closer to "aaaaa" than
+#   "aa_aaa"
 # - Consider API (objects, functions?) for best match (or good-enough
 #   match), multiple queries, screening
 # - Merge with skrub/_minhash_encoder.py (requires consider maybe a
